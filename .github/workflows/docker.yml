@@ -128,8 +128,12 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Create and push manifest
+        # BuildKit can publish each architecture as an index containing attestations.
+        # imagetools combines those indexes into a single multi-architecture image.
         run: |
-          docker manifest create ${MATRIX_IMAGE} ${MATRIX_IMAGE}-amd64 ${MATRIX_IMAGE}-arm64
-          docker manifest push ${MATRIX_IMAGE}
+          docker buildx imagetools create \
+            --tag "${MATRIX_IMAGE}" \
+            "${MATRIX_IMAGE}-amd64" \
+            "${MATRIX_IMAGE}-arm64"
         env:
           MATRIX_IMAGE: ${{ matrix.image }}
