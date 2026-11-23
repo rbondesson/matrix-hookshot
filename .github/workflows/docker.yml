@@ -4,17 +4,7 @@ name: "Docker"
 
 on:
   push:
-    branches: [main]
-    paths-ignore:
-      - 'changelog.d/**'
-  pull_request:
-    branches: [main]
-    paths-ignore:
-      - 'changelog.d/**'
-  release:
-    types: [published]
-
-  merge_group:
+    branches: [integration/op-us2-4b]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}-${{ github.event_name }}
@@ -38,10 +28,11 @@ jobs:
             type=ref,event=branch
             type=ref,event=pr
             type=raw,value=latest,enable={{is_default_branch}}
+            type=sha,format=long
           flavor: |
             latest=auto
           images: |
-            ghcr.io/matrix-org/matrix-hookshot
+            ghcr.io/rbondesson/matrix-hookshot
 
   docker-build:
     permissions:
@@ -79,11 +70,12 @@ jobs:
             type=semver,pattern={{version}}
             type=ref,event=branch
             type=raw,value=latest,enable={{is_default_branch}}
+            type=sha,format=long
           flavor: |
             latest=auto
             suffix=-${{ matrix.arch }},onlatest=true
           images: |
-            ghcr.io/matrix-org/matrix-hookshot
+            ghcr.io/rbondesson/matrix-hookshot
 
       - name: Build Docker image for smoke test
         uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8 # v6
